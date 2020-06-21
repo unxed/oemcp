@@ -8,3 +8,5 @@ Why do you need this tool? Windows store file names in .zip archives using so ca
 So you can put oemcp.sh to /usr/bin (don't forget to do `chmod 755` on it), run export UNZIP="-O cp\`oemcp.sh\`" and have your archives encoding detected automatically based on system locale.
 
 For sure OEM code page autodetection trick should be done inside unzip tool itself, but I do not know where actual development repo is, and lastest sourceforge snapshot fails to build on my system. Maybe one day I will find some time to implement it. Maybe not.
+
+PS: unzip's OEM charset processing is done in init_conversion_charsets() inside unix/unix.c
