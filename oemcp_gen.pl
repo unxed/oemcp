@@ -34,11 +34,14 @@ foreach(sort @dir){
                 print "$ln", "_", "$cn - $cp\n";
                 print FH 'if [ "$lang" = "', $ln, '_', $cn, '" ]; then', "\n";
                 print FH "echo '$cp'\n";
+                print FH "exit\n";
                 print FH "fi\n";
             }
         }
     }
 }
+
+print FH "echo 437\n";
 
 close(FH);
 
