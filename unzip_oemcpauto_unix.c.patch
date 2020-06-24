@@ -2,7 +2,7 @@
   * ISO_CP is left alone for now. */
  void init_conversion_charsets()
  {
-+    char *locale = strdup(setlocale(LC_ALL, ""));
++    char *locale = strdup(setlocale(LC_CTYPE, ""));
 +    char *lang = strtok(locale, ".");
 +
 +    // CP437 is default
