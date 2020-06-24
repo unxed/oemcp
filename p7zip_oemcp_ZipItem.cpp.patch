@@ -19,8 +19,9 @@
 +  if (!isUtf8) { 
 +
 +    char OEM_CP[25] = "";
-+    char *locale = strdup(setlocale(LC_CTYPE, ""));
-+    char *lang = strtok(locale, ".");
++    char *locale = setlocale(LC_CTYPE, "");
++    char *lang = "";
++    if (locale) lang = strtok(locale, ".");
 +
 +    // CP437 is default
 +    strncpy(OEM_CP, "CP437\0", 6);
