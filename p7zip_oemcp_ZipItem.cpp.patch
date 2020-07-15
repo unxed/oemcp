@@ -9,157 +9,73 @@
  #include "StdAfx.h"
  
  #include "../../../../C/CpuArch.h"
-@@ -244,6 +249,169 @@
+@@ -244,6 +249,86 @@
      #endif
    }
    
 +  #ifndef _WIN32
 +  // Convert OEM char set to UTF-8 if needed
 +  // Use system locale to select code page
-+  if (!isUtf8) { 
 +
-+    char OEM_CP[25] = "";
-+    char *locale = setlocale(LC_CTYPE, "");
-+    char *lang = "";
-+    if (locale) lang = strtok(locale, ".");
++  Byte hostOS = GetHostOS();
++  if (!isUtf8 && ((hostOS == NFileHeader::NHostOS::kFAT) || (hostOS == NFileHeader::NHostOS::kNTFS))) {
 +
-+    // CP437 is default
-+    strncpy(OEM_CP, "CP437\0", 6);
++    const char *oemcp;
++    oemcp = getenv("OEMCP");
++    if (!oemcp) {
++      oemcp = "CP437\0"; // CP name is 6 chars max
 +
-+    if (strcmp(lang, "af_ZA") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "ar_SA") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_LB") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_EG") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_DZ") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_BH") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_IQ") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_JO") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_KW") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_LY") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_MA") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_OM") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_QA") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_SY") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_TN") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_AE") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ar_YE") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "ast_ES") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "az_AZ") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "az_AZ") == 0) { strncpy(OEM_CP, "CP857\0", 6); }
-+    if (strcmp(lang, "be_BY") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "bg_BG") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "br_FR") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "ca_ES") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "zh_CN") == 0) { strncpy(OEM_CP, "CP936\0", 6); }
-+    if (strcmp(lang, "zh_TW") == 0) { strncpy(OEM_CP, "CP950\0", 6); }
-+    if (strcmp(lang, "kw_GB") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "cs_CZ") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "cy_GB") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "da_DK") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "de_AT") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "de_LI") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "de_LU") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "de_CH") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "de_DE") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "el_GR") == 0) { strncpy(OEM_CP, "CP737\0", 6); }
-+    if (strcmp(lang, "en_AU") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "en_CA") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "en_GB") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "en_IE") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "en_JM") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "en_BZ") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "en_PH") == 0) { strncpy(OEM_CP, "CP437\0", 6); }
-+    if (strcmp(lang, "en_ZA") == 0) { strncpy(OEM_CP, "CP437\0", 6); }
-+    if (strcmp(lang, "en_TT") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "en_US") == 0) { strncpy(OEM_CP, "CP437\0", 6); }
-+    if (strcmp(lang, "en_ZW") == 0) { strncpy(OEM_CP, "CP437\0", 6); }
-+    if (strcmp(lang, "en_NZ") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_PA") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_BO") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_CR") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_DO") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_SV") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_EC") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_GT") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_HN") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_NI") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_CL") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_MX") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_ES") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_CO") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_ES") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_PE") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_AR") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_PR") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_VE") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_UY") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "es_PY") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "et_EE") == 0) { strncpy(OEM_CP, "CP775\0", 6); }
-+    if (strcmp(lang, "eu_ES") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "fa_IR") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "fi_FI") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "fo_FO") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "fr_FR") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "fr_BE") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "fr_CA") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "fr_LU") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "fr_MC") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "fr_CH") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "ga_IE") == 0) { strncpy(OEM_CP, "CP437\0", 6); }
-+    if (strcmp(lang, "gd_GB") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "gv_IM") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "gl_ES") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "he_IL") == 0) { strncpy(OEM_CP, "CP862\0", 6); }
-+    if (strcmp(lang, "hr_HR") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "hu_HU") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "id_ID") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "is_IS") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "it_IT") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "it_CH") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "iv_IV") == 0) { strncpy(OEM_CP, "CP437\0", 6); }
-+    if (strcmp(lang, "ja_JP") == 0) { strncpy(OEM_CP, "CP932\0", 6); }
-+    if (strcmp(lang, "kk_KZ") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "ko_KR") == 0) { strncpy(OEM_CP, "CP949\0", 6); }
-+    if (strcmp(lang, "ky_KG") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "lt_LT") == 0) { strncpy(OEM_CP, "CP775\0", 6); }
-+    if (strcmp(lang, "lv_LV") == 0) { strncpy(OEM_CP, "CP775\0", 6); }
-+    if (strcmp(lang, "mk_MK") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "mn_MN") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "ms_BN") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "ms_MY") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "nl_BE") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "nl_NL") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "nl_SR") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "nn_NO") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "nb_NO") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "pl_PL") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "pt_BR") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "pt_PT") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "rm_CH") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "ro_RO") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "ru_RU") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "sk_SK") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "sl_SI") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "sq_AL") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "sr_RS") == 0) { strncpy(OEM_CP, "CP855\0", 6); }
-+    if (strcmp(lang, "sr_RS") == 0) { strncpy(OEM_CP, "CP852\0", 6); }
-+    if (strcmp(lang, "sv_SE") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "sv_FI") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "sw_KE") == 0) { strncpy(OEM_CP, "CP437\0", 6); }
-+    if (strcmp(lang, "th_TH") == 0) { strncpy(OEM_CP, "CP874\0", 6); }
-+    if (strcmp(lang, "tr_TR") == 0) { strncpy(OEM_CP, "CP857\0", 6); }
-+    if (strcmp(lang, "tt_RU") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "uk_UA") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "ur_PK") == 0) { strncpy(OEM_CP, "CP720\0", 6); }
-+    if (strcmp(lang, "uz_UZ") == 0) { strncpy(OEM_CP, "CP866\0", 6); }
-+    if (strcmp(lang, "uz_UZ") == 0) { strncpy(OEM_CP, "CP857\0", 6); }
-+    if (strcmp(lang, "vi_VN") == 0) { strncpy(OEM_CP, "CP1258\0", 6); }
-+    if (strcmp(lang, "wa_BE") == 0) { strncpy(OEM_CP, "CP850\0", 6); }
-+    if (strcmp(lang, "zh_HK") == 0) { strncpy(OEM_CP, "CP950\0", 6); }
-+    if (strcmp(lang, "zh_SG") == 0) { strncpy(OEM_CP, "CP936\0", 6); }
++      const char *lc_to_cp_table[] = {
++      "af_ZA", "CP850", "ar_SA", "CP720", "ar_LB", "CP720", "ar_EG", "CP720",
++      "ar_DZ", "CP720", "ar_BH", "CP720", "ar_IQ", "CP720", "ar_JO", "CP720",
++      "ar_KW", "CP720", "ar_LY", "CP720", "ar_MA", "CP720", "ar_OM", "CP720",
++      "ar_QA", "CP720", "ar_SY", "CP720", "ar_TN", "CP720", "ar_AE", "CP720",
++      "ar_YE", "CP720","ast_ES", "CP850", "az_AZ", "CP866", "az_AZ", "CP857",
++      "be_BY", "CP866", "bg_BG", "CP866", "br_FR", "CP850", "ca_ES", "CP850",
++      "zh_CN", "CP936", "zh_TW", "CP950", "kw_GB", "CP850", "cs_CZ", "CP852",
++      "cy_GB", "CP850", "da_DK", "CP850", "de_AT", "CP850", "de_LI", "CP850",
++      "de_LU", "CP850", "de_CH", "CP850", "de_DE", "CP850", "el_GR", "CP737",
++      "en_AU", "CP850", "en_CA", "CP850", "en_GB", "CP850", "en_IE", "CP850",
++      "en_JM", "CP850", "en_BZ", "CP850", "en_PH", "CP437", "en_ZA", "CP437",
++      "en_TT", "CP850", "en_US", "CP437", "en_ZW", "CP437", "en_NZ", "CP850",
++      "es_PA", "CP850", "es_BO", "CP850", "es_CR", "CP850", "es_DO", "CP850",
++      "es_SV", "CP850", "es_EC", "CP850", "es_GT", "CP850", "es_HN", "CP850",
++      "es_NI", "CP850", "es_CL", "CP850", "es_MX", "CP850", "es_ES", "CP850",
++      "es_CO", "CP850", "es_ES", "CP850", "es_PE", "CP850", "es_AR", "CP850",
++      "es_PR", "CP850", "es_VE", "CP850", "es_UY", "CP850", "es_PY", "CP850",
++      "et_EE", "CP775", "eu_ES", "CP850", "fa_IR", "CP720", "fi_FI", "CP850",
++      "fo_FO", "CP850", "fr_FR", "CP850", "fr_BE", "CP850", "fr_CA", "CP850",
++      "fr_LU", "CP850", "fr_MC", "CP850", "fr_CH", "CP850", "ga_IE", "CP437",
++      "gd_GB", "CP850", "gv_IM", "CP850", "gl_ES", "CP850", "he_IL", "CP862",
++      "hr_HR", "CP852", "hu_HU", "CP852", "id_ID", "CP850", "is_IS", "CP850",
++      "it_IT", "CP850", "it_CH", "CP850", "iv_IV", "CP437", "ja_JP", "CP932",
++      "kk_KZ", "CP866", "ko_KR", "CP949", "ky_KG", "CP866", "lt_LT", "CP775",
++      "lv_LV", "CP775", "mk_MK", "CP866", "mn_MN", "CP866", "ms_BN", "CP850",
++      "ms_MY", "CP850", "nl_BE", "CP850", "nl_NL", "CP850", "nl_SR", "CP850",
++      "nn_NO", "CP850", "nb_NO", "CP850", "pl_PL", "CP852", "pt_BR", "CP850",
++      "pt_PT", "CP850", "rm_CH", "CP850", "ro_RO", "CP852", "ru_RU", "CP866",
++      "sk_SK", "CP852", "sl_SI", "CP852", "sq_AL", "CP852", "sr_RS", "CP855",
++      "sr_RS", "CP852", "sv_SE", "CP850", "sv_FI", "CP850", "sw_KE", "CP437",
++      "th_TH", "CP874", "tr_TR", "CP857", "tt_RU", "CP866", "uk_UA", "CP866",
++      "ur_PK", "CP720", "uz_UZ", "CP866", "uz_UZ", "CP857", "vi_VN", "CP1258",
++      "wa_BE", "CP850", "zh_HK", "CP950", "zh_SG", "CP936"};
++      int table_len = sizeof(lc_to_cp_table) / sizeof(char *);
++      int lc_len, i;
++
++      char *lc = setlocale(LC_CTYPE, "");
++
++      if (lc && lc[0]) {
++          // Compare up to the dot, if it exists, e.g. en_US.UTF-8
++          for (lc_len = 0; lc[lc_len] != '.' && lc[lc_len] != '\0'; ++lc_len)
++              ;
++          for (i = 0; i < table_len; i += 2)
++              if (strncmp(lc, lc_to_cp_table[i], lc_len) == 0)
++                  oemcp = lc_to_cp_table[i + 1];
++      }
++    }
 +
 +    iconv_t cd;
-+    if ((cd = iconv_open("UTF-8", OEM_CP)) != (iconv_t)-1) {
++    if ((cd = iconv_open("UTF-8", oemcp)) != (iconv_t)-1) {
 +
 +      AString s_utf8;
 +      const char* src = s.Ptr();
