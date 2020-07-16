@@ -8,7 +8,7 @@ https://github.com/mate-desktop/engrampa/issues/5
 
 So you can put oemcp.sh to /usr/bin (don't forget to do `chmod 755` on it), run export UNZIP="-O cp\`oemcp.sh\`" and have your archives encoding detected automatically based on system locale.
 
-UPD: unzip610b_oemcpauto.tar.gz is unzip from sourceforge patched to support proper OEM code page auto detection.  	unzip_oemcpauto_unix.c.patch is patch itself. Make by `make -f unix/Makefile generic`
+UPD: unzip610b_oemcpauto.tar.gz is unzip from sourceforge patched to support proper OEM code page auto detection. unzip_oemcpauto_unix.c.patch is a patch itself. Make by `make -f unix/Makefile generic`
 https://sourceforge.net/p/infozip/patches/29/
 
 UPD#2: p7zip_16.02_oemcpauto.tar.gz and p7zip_oemcp_ZipItem.cpp.patch - the same for p7zip
