@@ -12,11 +12,13 @@ close DIR;
 
 ##print join(", ", @parts),"\n";
 
-foreach(sort @dir){
+foreach(sort @dir) {
+
     if (-f $dir . "/" . $_ ) {
+    
         my @parts = split "\\.", $_;
         if (@parts[1] eq 'nls') {
-            #print $_, "\n";
+
             open(my $file, '<', $dir . "/" . $_) or die "Unable to open $!";
             my @strings=<$file>;
             foreach(@strings) {
@@ -26,12 +28,11 @@ foreach(sort @dir){
                 if ($match2[1]) { $cn = $match2[1]; }
                 my ( @match3 ) = ($_ =~ /(LOCALE_SISO639LANGNAME "(\w+)")/g);
                 if ($match3[1]) { $ln = $match3[1]; }
-                #  LOCALE_IDEFAULTCODEPAGE "850"
-                #  LOCALE_SISO3166CTRYNAME "ZA"
-                #  LOCALE_SISO639LANGNAME "af"
             }
+
             if (($cn ne '029') && ($cp ne '1')) {
-                print "$ln", "_", "$cn - $cp\n";
+                print $ln, '_', $cn, ',', $cp, "\n";
+
                 print FH 'if [ "$lang" = "', $ln, '_', $cn, '" ]; then', "\n";
                 print FH "echo '$cp'\n";
                 print FH "exit\n";

@@ -1,132 +1,132 @@
-af_ZA - 850
-ar_SA - 720
-ar_LB - 720
-ar_EG - 720
-ar_DZ - 720
-ar_BH - 720
-ar_IQ - 720
-ar_JO - 720
-ar_KW - 720
-ar_LY - 720
-ar_MA - 720
-ar_OM - 720
-ar_QA - 720
-ar_SY - 720
-ar_TN - 720
-ar_AE - 720
-ar_YE - 720
-ast_ES - 850
-az_AZ - 866
-az_AZ - 857
-be_BY - 866
-bg_BG - 866
-br_FR - 850
-ca_ES - 850
-zh_CN - 936
-zh_TW - 950
-kw_GB - 850
-cs_CZ - 852
-cy_GB - 850
-da_DK - 850
-de_AT - 850
-de_LI - 850
-de_LU - 850
-de_CH - 850
-de_DE - 850
-el_GR - 737
-en_AU - 850
-en_CA - 850
-en_GB - 850
-en_IE - 850
-en_JM - 850
-en_BZ - 850
-en_PH - 437
-en_ZA - 437
-en_TT - 850
-en_US - 437
-en_ZW - 437
-en_NZ - 850
-es_PA - 850
-es_BO - 850
-es_CR - 850
-es_DO - 850
-es_SV - 850
-es_EC - 850
-es_GT - 850
-es_HN - 850
-es_NI - 850
-es_CL - 850
-es_MX - 850
-es_ES - 850
-es_CO - 850
-es_ES - 850
-es_PE - 850
-es_AR - 850
-es_PR - 850
-es_VE - 850
-es_UY - 850
-es_PY - 850
-et_EE - 775
-eu_ES - 850
-fa_IR - 720
-fi_FI - 850
-fo_FO - 850
-fr_FR - 850
-fr_BE - 850
-fr_CA - 850
-fr_LU - 850
-fr_MC - 850
-fr_CH - 850
-ga_IE - 437
-gd_GB - 850
-gv_IM - 850
-gl_ES - 850
-he_IL - 862
-hr_HR - 852
-hu_HU - 852
-id_ID - 850
-is_IS - 850
-it_IT - 850
-it_CH - 850
-iv_IV - 437
-ja_JP - 932
-kk_KZ - 866
-ko_KR - 949
-ky_KG - 866
-lt_LT - 775
-lv_LV - 775
-mk_MK - 866
-mn_MN - 866
-ms_BN - 850
-ms_MY - 850
-nl_BE - 850
-nl_NL - 850
-nl_SR - 850
-nn_NO - 850
-nb_NO - 850
-pl_PL - 852
-pt_BR - 850
-pt_PT - 850
-rm_CH - 850
-ro_RO - 852
-ru_RU - 866
-sk_SK - 852
-sl_SI - 852
-sq_AL - 852
-sr_RS - 855
-sr_RS - 852
-sv_SE - 850
-sv_FI - 850
-sw_KE - 437
-th_TH - 874
-tr_TR - 857
-tt_RU - 866
-uk_UA - 866
-ur_PK - 720
-uz_UZ - 866
-uz_UZ - 857
-vi_VN - 1258
-wa_BE - 850
-zh_HK - 950
-zh_SG - 936
-zh_MO - 950
+af_ZA,850
+ar_SA,720
+ar_LB,720
+ar_EG,720
+ar_DZ,720
+ar_BH,720
+ar_IQ,720
+ar_JO,720
+ar_KW,720
+ar_LY,720
+ar_MA,720
+ar_OM,720
+ar_QA,720
+ar_SY,720
+ar_TN,720
+ar_AE,720
+ar_YE,720
+ast_ES,850
+az_AZ,866
+az_AZ,857
+be_BY,866
+bg_BG,866
+br_FR,850
+ca_ES,850
+zh_CN,936
+zh_TW,950
+kw_GB,850
+cs_CZ,852
+cy_GB,850
+da_DK,850
+de_AT,850
+de_LI,850
+de_LU,850
+de_CH,850
+de_DE,850
+el_GR,737
+en_AU,850
+en_CA,850
+en_GB,850
+en_IE,850
+en_JM,850
+en_BZ,850
+en_PH,437
+en_ZA,437
+en_TT,850
+en_US,437
+en_ZW,437
+en_NZ,850
+es_PA,850
+es_BO,850
+es_CR,850
+es_DO,850
+es_SV,850
+es_EC,850
+es_GT,850
+es_HN,850
+es_NI,850
+es_CL,850
+es_MX,850
+es_ES,850
+es_CO,850
+es_ES,850
+es_PE,850
+es_AR,850
+es_PR,850
+es_VE,850
+es_UY,850
+es_PY,850
+et_EE,775
+eu_ES,850
+fa_IR,720
+fi_FI,850
+fo_FO,850
+fr_FR,850
+fr_BE,850
+fr_CA,850
+fr_LU,850
+fr_MC,850
+fr_CH,850
+ga_IE,437
+gd_GB,850
+gv_IM,850
+gl_ES,850
+he_IL,862
+hr_HR,852
+hu_HU,852
+id_ID,850
+is_IS,850
+it_IT,850
+it_CH,850
+iv_IV,437
+ja_JP,932
+kk_KZ,866
+ko_KR,949
+ky_KG,866
+lt_LT,775
+lv_LV,775
+mk_MK,866
+mn_MN,866
+ms_BN,850
+ms_MY,850
+nl_BE,850
+nl_NL,850
+nl_SR,850
+nn_NO,850
+nb_NO,850
+pl_PL,852
+pt_BR,850
+pt_PT,850
+rm_CH,850
+ro_RO,852
+ru_RU,866
+sk_SK,852
+sl_SI,852
+sq_AL,852
+sr_RS,855
+sr_RS,852
+sv_SE,850
+sv_FI,850
+sw_KE,437
+th_TH,874
+tr_TR,857
+tt_RU,866
+uk_UA,866
+ur_PK,720
+uz_UZ,866
+uz_UZ,857
+vi_VN,1258
+wa_BE,850
+zh_HK,950
+zh_SG,936
+zh_MO,950
