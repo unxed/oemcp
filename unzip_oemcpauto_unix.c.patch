@@ -15,7 +15,7 @@
  static CHARSET_MAP dos_charset_map[] = {
      { "ANSI_X3.4-1968", "CP850" },
      { "ISO-8859-1", "CP850" },
-@@ -1974,18 +1977,79 @@
+@@ -1974,18 +1977,82 @@
      { "KOI8-U", "CP866" },
      { "ISO-8859-5", "CP866" }
  };
@@ -78,12 +78,15 @@
   * ISO_CP is left alone for now. */
  void init_conversion_charsets()
  {
-+    char *oemcp;
-+    oemcp = getenv("OEMCP");
-+    if (!oemcp) {
-+        oemcp = lc_to_oem_cp(setlocale(LC_CTYPE, ""));
++    /* Make a guess only if OEM_CP not already set. */ 
++    if(*OEM_CP == '\0') {
++        char *oemcp;
++        oemcp = getenv("OEMCP");
++        if (!oemcp) {
++            oemcp = lc_to_oem_cp(setlocale(LC_CTYPE, ""));
++        }
++        strncpy(OEM_CP, oemcp, strlen(oemcp));
 +    }
-+    strncpy(OEM_CP, oemcp, strlen(oemcp));
 +
 +    /*
      const char *local_charset;
@@ -95,7 +98,7 @@
      if(*OEM_CP == '\0') {
      	local_charset = nl_langinfo(CODESET);
      	for(i = 0; i < sizeof(dos_charset_map)/sizeof(CHARSET_MAP); i++)
-@@ -1995,6 +2059,7 @@
+@@ -1995,6 +2062,7 @@
      			break;
      		}
      }
