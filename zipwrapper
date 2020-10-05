@@ -3,6 +3,8 @@
 # Use "zipwrapper [un]zip PARAMETERS" instead of "[un]zip PARAMETERS"
 # to process all locales-releated stuff automatically
 
+# Todo: check if -I/-O options are supported in installed version of zip/unzip
+
 use POSIX qw(setlocale locale_h LC_ALL);
 
 # Locale to code page translation tables
