@@ -377,12 +377,12 @@ if (scalar(@arg) == 1) {
             $ret = qx($cmd);
         }
         print $ret;
-        if ($? == 1) { exit; } else { exit($?/256); } # suppress warnings (code 1)
+        if ($? == 256) { exit 0; } else { exit($?/256); } # suppress warnings (code 1)
     } else {
         # Pass to zip "as is"
         $cmd = join ' ', @arg;
         print qx($cmd);
-        if ($? == 1) { exit; } else { exit($?/256); } # suppress warnings (code 1)
+        if ($? == 256) { exit 0; } else { exit($?/256); } # suppress warnings (code 1)
     }
 
 } elsif ($unzip) {
@@ -439,7 +439,7 @@ if (scalar(@arg) == 1) {
     }
 
     print $ret;
-    if ($? == 1) { exit; } else { exit($?/256); } # suppress warnings (code 1)
+    if ($? == 256) { exit 0; } else { exit($?/256); } # suppress warnings (code 1)
 
 } else {
 
@@ -450,7 +450,7 @@ if (scalar(@arg) == 1) {
         $ret = qx($cmd);
 
         print $ret;
-        if ($? == 1) { exit; } else { exit($?/256); } # suppress warnings (code 1)
+        if ($? == 256) { exit 0; } else { exit($?/256); } # suppress warnings (code 1)
 
     } else {
 
