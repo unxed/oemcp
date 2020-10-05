@@ -377,12 +377,12 @@ if (scalar(@arg) == 1) {
             $ret = qx($cmd);
         }
         print $ret;
-        exit $?;
+        exit($?/256);
     } else {
         # Pass to zip "as is"
         $cmd = join ' ', @arg;
         print qx($cmd);
-        exit $?;
+        exit($?/256);
     }
 
 } elsif ($unzip) {
@@ -439,7 +439,7 @@ if (scalar(@arg) == 1) {
     }
 
     print $ret;
-    exit $?;
+    exit($?/256);
 
 } else {
 
@@ -450,7 +450,7 @@ if (scalar(@arg) == 1) {
         $ret = qx($cmd);
 
         print $ret;
-        exit $?;
+        exit($?/256);
 
     } else {
 
