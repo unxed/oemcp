@@ -377,12 +377,12 @@ if (scalar(@arg) == 1) {
             $ret = qx($cmd);
         }
         print $ret;
-        exit($?/256);
+        if ($? == 1) { exit; } else { exit($?/256); } # suppress warnings (code 1)
     } else {
         # Pass to zip "as is"
         $cmd = join ' ', @arg;
         print qx($cmd);
-        exit($?/256);
+        if ($? == 1) { exit; } else { exit($?/256); } # suppress warnings (code 1)
     }
 
 } elsif ($unzip) {
@@ -439,7 +439,7 @@ if (scalar(@arg) == 1) {
     }
 
     print $ret;
-    exit($?/256);
+    if ($? == 1) { exit; } else { exit($?/256); } # suppress warnings (code 1)
 
 } else {
 
@@ -450,7 +450,7 @@ if (scalar(@arg) == 1) {
         $ret = qx($cmd);
 
         print $ret;
-        exit($?/256);
+        if ($? == 1) { exit; } else { exit($?/256); } # suppress warnings (code 1)
 
     } else {
 
@@ -473,3 +473,4 @@ sub help() {
     print "zipwrapper unzip PARAMETERS\n\n";
     print "Use zip --help or unzip --help for more details\n";
 }
+
