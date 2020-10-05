@@ -446,6 +446,7 @@ sub help() {
     print "so can be used with any program utilizing zip/unzip,\n";
     print "like File Roller, Engrampa, Ark, far2l, etc.\n\n";
     print "Known limitation: -@ mode is not supported for now.\n\n";
+    print "License: Public Domain.\n\n";
     print "Usage:\n";
     print "zipwrapper zip PARAMETERS\n";
     print "zipwrapper unzip PARAMETERS\n\n";
