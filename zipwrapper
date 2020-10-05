@@ -285,7 +285,7 @@ $lc = @lc[0];
 $cp_oem = $ltoem{$lc};
 $cp_ansi = $ltansi{$lc};
 if (!$cp_oem) { $cp_oem = 437; }
-if (!$cp_ansi) { $cp_oem = 1252; }
+if (!$cp_ansi) { $cp_ansi = 1252; }
 
 # Prepare converters (for "zip -d")
 use Text::Iconv;
@@ -411,6 +411,25 @@ if (scalar(@arg) == 1) {
             if (!$inserted) {
                 push (@arg2, "-O");
                 push (@arg2, "utf-8");
+                $inserted = 1;
+            }
+        }
+
+        $cmd = join ' ', @arg2;
+        $ret = qx($cmd);
+    }
+
+    if ($? == 2816) {
+        # File still not found in archive (error code 11 * 256 = 2816)?
+        # Retrying as ANSI
+        # (have no samples to test, but theoretically possible for some ancient winzip versions)
+        @arg2 = '';
+        $inserted = '';
+        foreach (@arg) {
+            push (@arg2, $_);
+            if (!$inserted) {
+                push (@arg2, "-O");
+                push (@arg2, "cp" . $cp_ansi);
                 $inserted = 1;
             }
         }
