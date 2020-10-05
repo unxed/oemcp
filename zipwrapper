@@ -1,0 +1,452 @@
+#!/usr/bin/perl
+
+# Use "zipwrapper [un]zip PARAMETERS" instead of "[un]zip PARAMETERS"
+# to process all locales-releated stuff automatically
+
+use POSIX qw(setlocale locale_h LC_ALL);
+
+# Locale to code page translation tables
+# from https://github.com/unxed/oemcp/
+# Generated from Wine sources
+
+$ltoem{'af_ZA'} = 850;
+$ltoem{'ar_SA'} = 720;
+$ltoem{'ar_LB'} = 720;
+$ltoem{'ar_EG'} = 720;
+$ltoem{'ar_DZ'} = 720;
+$ltoem{'ar_BH'} = 720;
+$ltoem{'ar_IQ'} = 720;
+$ltoem{'ar_JO'} = 720;
+$ltoem{'ar_KW'} = 720;
+$ltoem{'ar_LY'} = 720;
+$ltoem{'ar_MA'} = 720;
+$ltoem{'ar_OM'} = 720;
+$ltoem{'ar_QA'} = 720;
+$ltoem{'ar_SY'} = 720;
+$ltoem{'ar_TN'} = 720;
+$ltoem{'ar_AE'} = 720;
+$ltoem{'ar_YE'} = 720;
+$ltoem{'ast_ES'} = 850;
+$ltoem{'az_AZ'} = 866;
+$ltoem{'az_AZ'} = 857;
+$ltoem{'be_BY'} = 866;
+$ltoem{'bg_BG'} = 866;
+$ltoem{'br_FR'} = 850;
+$ltoem{'ca_ES'} = 850;
+$ltoem{'zh_CN'} = 936;
+$ltoem{'zh_TW'} = 950;
+$ltoem{'kw_GB'} = 850;
+$ltoem{'cs_CZ'} = 852;
+$ltoem{'cy_GB'} = 850;
+$ltoem{'da_DK'} = 850;
+$ltoem{'de_AT'} = 850;
+$ltoem{'de_LI'} = 850;
+$ltoem{'de_LU'} = 850;
+$ltoem{'de_CH'} = 850;
+$ltoem{'de_DE'} = 850;
+$ltoem{'el_GR'} = 737;
+$ltoem{'en_AU'} = 850;
+$ltoem{'en_CA'} = 850;
+$ltoem{'en_GB'} = 850;
+$ltoem{'en_IE'} = 850;
+$ltoem{'en_JM'} = 850;
+$ltoem{'en_BZ'} = 850;
+$ltoem{'en_PH'} = 437;
+$ltoem{'en_ZA'} = 437;
+$ltoem{'en_TT'} = 850;
+$ltoem{'en_US'} = 437;
+$ltoem{'en_ZW'} = 437;
+$ltoem{'en_NZ'} = 850;
+$ltoem{'es_PA'} = 850;
+$ltoem{'es_BO'} = 850;
+$ltoem{'es_CR'} = 850;
+$ltoem{'es_DO'} = 850;
+$ltoem{'es_SV'} = 850;
+$ltoem{'es_EC'} = 850;
+$ltoem{'es_GT'} = 850;
+$ltoem{'es_HN'} = 850;
+$ltoem{'es_NI'} = 850;
+$ltoem{'es_CL'} = 850;
+$ltoem{'es_MX'} = 850;
+$ltoem{'es_ES'} = 850;
+$ltoem{'es_CO'} = 850;
+$ltoem{'es_ES'} = 850;
+$ltoem{'es_PE'} = 850;
+$ltoem{'es_AR'} = 850;
+$ltoem{'es_PR'} = 850;
+$ltoem{'es_VE'} = 850;
+$ltoem{'es_UY'} = 850;
+$ltoem{'es_PY'} = 850;
+$ltoem{'et_EE'} = 775;
+$ltoem{'eu_ES'} = 850;
+$ltoem{'fa_IR'} = 720;
+$ltoem{'fi_FI'} = 850;
+$ltoem{'fo_FO'} = 850;
+$ltoem{'fr_FR'} = 850;
+$ltoem{'fr_BE'} = 850;
+$ltoem{'fr_CA'} = 850;
+$ltoem{'fr_LU'} = 850;
+$ltoem{'fr_MC'} = 850;
+$ltoem{'fr_CH'} = 850;
+$ltoem{'ga_IE'} = 437;
+$ltoem{'gd_GB'} = 850;
+$ltoem{'gv_IM'} = 850;
+$ltoem{'gl_ES'} = 850;
+$ltoem{'he_IL'} = 862;
+$ltoem{'hr_HR'} = 852;
+$ltoem{'hu_HU'} = 852;
+$ltoem{'id_ID'} = 850;
+$ltoem{'is_IS'} = 850;
+$ltoem{'it_IT'} = 850;
+$ltoem{'it_CH'} = 850;
+$ltoem{'iv_IV'} = 437;
+$ltoem{'ja_JP'} = 932;
+$ltoem{'kk_KZ'} = 866;
+$ltoem{'ko_KR'} = 949;
+$ltoem{'ky_KG'} = 866;
+$ltoem{'lt_LT'} = 775;
+$ltoem{'lv_LV'} = 775;
+$ltoem{'mk_MK'} = 866;
+$ltoem{'mn_MN'} = 866;
+$ltoem{'ms_BN'} = 850;
+$ltoem{'ms_MY'} = 850;
+$ltoem{'nl_BE'} = 850;
+$ltoem{'nl_NL'} = 850;
+$ltoem{'nl_SR'} = 850;
+$ltoem{'nn_NO'} = 850;
+$ltoem{'nb_NO'} = 850;
+$ltoem{'pl_PL'} = 852;
+$ltoem{'pt_BR'} = 850;
+$ltoem{'pt_PT'} = 850;
+$ltoem{'rm_CH'} = 850;
+$ltoem{'ro_RO'} = 852;
+$ltoem{'ru_RU'} = 866;
+$ltoem{'sk_SK'} = 852;
+$ltoem{'sl_SI'} = 852;
+$ltoem{'sq_AL'} = 852;
+$ltoem{'sr_RS'} = 855;
+$ltoem{'sr_RS'} = 852;
+$ltoem{'sv_SE'} = 850;
+$ltoem{'sv_FI'} = 850;
+$ltoem{'sw_KE'} = 437;
+$ltoem{'th_TH'} = 874;
+$ltoem{'tr_TR'} = 857;
+$ltoem{'tt_RU'} = 866;
+$ltoem{'uk_UA'} = 866;
+$ltoem{'ur_PK'} = 720;
+$ltoem{'uz_UZ'} = 866;
+$ltoem{'uz_UZ'} = 857;
+$ltoem{'vi_VN'} = 1258;
+$ltoem{'wa_BE'} = 850;
+$ltoem{'zh_HK'} = 950;
+$ltoem{'zh_SG'} = 936;
+$ltoem{'zh_MO'} = 950;
+
+$ltansi{'af_ZA'} = 1252;
+$ltansi{'ar_SA'} = 1256;
+$ltansi{'ar_LB'} = 1256;
+$ltansi{'ar_EG'} = 1256;
+$ltansi{'ar_DZ'} = 1256;
+$ltansi{'ar_BH'} = 1256;
+$ltansi{'ar_IQ'} = 1256;
+$ltansi{'ar_JO'} = 1256;
+$ltansi{'ar_KW'} = 1256;
+$ltansi{'ar_LY'} = 1256;
+$ltansi{'ar_MA'} = 1256;
+$ltansi{'ar_OM'} = 1256;
+$ltansi{'ar_QA'} = 1256;
+$ltansi{'ar_SY'} = 1256;
+$ltansi{'ar_TN'} = 1256;
+$ltansi{'ar_AE'} = 1256;
+$ltansi{'ar_YE'} = 1256;
+$ltansi{'ast_ES'} = 1252;
+$ltansi{'az_AZ'} = 1251;
+$ltansi{'az_AZ'} = 1254;
+$ltansi{'be_BY'} = 1251;
+$ltansi{'bg_BG'} = 1251;
+$ltansi{'br_FR'} = 1252;
+$ltansi{'ca_ES'} = 1252;
+$ltansi{'zh_CN'} = 936;
+$ltansi{'zh_TW'} = 950;
+$ltansi{'kw_GB'} = 1252;
+$ltansi{'cs_CZ'} = 1250;
+$ltansi{'cy_GB'} = 28604;
+$ltansi{'da_DK'} = 1252;
+$ltansi{'de_AT'} = 1252;
+$ltansi{'de_LI'} = 1252;
+$ltansi{'de_LU'} = 1252;
+$ltansi{'de_CH'} = 1252;
+$ltansi{'de_DE'} = 1252;
+$ltansi{'el_GR'} = 1253;
+$ltansi{'en_AU'} = 1252;
+$ltansi{'en_CA'} = 1252;
+$ltansi{'en_GB'} = 1252;
+$ltansi{'en_IE'} = 1252;
+$ltansi{'en_JM'} = 1252;
+$ltansi{'en_BZ'} = 1252;
+$ltansi{'en_PH'} = 1252;
+$ltansi{'en_ZA'} = 1252;
+$ltansi{'en_TT'} = 1252;
+$ltansi{'en_US'} = 1252;
+$ltansi{'en_ZW'} = 1252;
+$ltansi{'en_NZ'} = 1252;
+$ltansi{'es_PA'} = 1252;
+$ltansi{'es_BO'} = 1252;
+$ltansi{'es_CR'} = 1252;
+$ltansi{'es_DO'} = 1252;
+$ltansi{'es_SV'} = 1252;
+$ltansi{'es_EC'} = 1252;
+$ltansi{'es_GT'} = 1252;
+$ltansi{'es_HN'} = 1252;
+$ltansi{'es_NI'} = 1252;
+$ltansi{'es_CL'} = 1252;
+$ltansi{'es_MX'} = 1252;
+$ltansi{'es_ES'} = 1252;
+$ltansi{'es_CO'} = 1252;
+$ltansi{'es_ES'} = 1252;
+$ltansi{'es_PE'} = 1252;
+$ltansi{'es_AR'} = 1252;
+$ltansi{'es_PR'} = 1252;
+$ltansi{'es_VE'} = 1252;
+$ltansi{'es_UY'} = 1252;
+$ltansi{'es_PY'} = 1252;
+$ltansi{'et_EE'} = 1257;
+$ltansi{'eu_ES'} = 1252;
+$ltansi{'fa_IR'} = 1256;
+$ltansi{'fi_FI'} = 1252;
+$ltansi{'fo_FO'} = 1252;
+$ltansi{'fr_FR'} = 1252;
+$ltansi{'fr_BE'} = 1252;
+$ltansi{'fr_CA'} = 1252;
+$ltansi{'fr_LU'} = 1252;
+$ltansi{'fr_MC'} = 1252;
+$ltansi{'fr_CH'} = 1252;
+$ltansi{'ga_IE'} = 1252;
+$ltansi{'gd_GB'} = 1252;
+$ltansi{'gv_IM'} = 1252;
+$ltansi{'gl_ES'} = 1252;
+$ltansi{'he_IL'} = 1255;
+$ltansi{'hr_HR'} = 1250;
+$ltansi{'hu_HU'} = 1250;
+$ltansi{'id_ID'} = 1252;
+$ltansi{'is_IS'} = 1252;
+$ltansi{'it_IT'} = 1252;
+$ltansi{'it_CH'} = 1252;
+$ltansi{'iv_IV'} = 1252;
+$ltansi{'ja_JP'} = 932;
+$ltansi{'kk_KZ'} = 1251;
+$ltansi{'ko_KR'} = 949;
+$ltansi{'ky_KG'} = 1251;
+$ltansi{'lt_LT'} = 1257;
+$ltansi{'lv_LV'} = 1257;
+$ltansi{'mk_MK'} = 1251;
+$ltansi{'mn_MN'} = 1251;
+$ltansi{'ms_BN'} = 1252;
+$ltansi{'ms_MY'} = 1252;
+$ltansi{'nl_BE'} = 1252;
+$ltansi{'nl_NL'} = 1252;
+$ltansi{'nl_SR'} = 1252;
+$ltansi{'nn_NO'} = 1252;
+$ltansi{'nb_NO'} = 1252;
+$ltansi{'pl_PL'} = 1250;
+$ltansi{'pt_BR'} = 1252;
+$ltansi{'pt_PT'} = 1252;
+$ltansi{'rm_CH'} = 1252;
+$ltansi{'ro_RO'} = 1250;
+$ltansi{'ru_RU'} = 1251;
+$ltansi{'sk_SK'} = 1250;
+$ltansi{'sl_SI'} = 1250;
+$ltansi{'sq_AL'} = 1250;
+$ltansi{'sr_RS'} = 1251;
+$ltansi{'sr_RS'} = 1250;
+$ltansi{'sv_SE'} = 1252;
+$ltansi{'sv_FI'} = 1252;
+$ltansi{'sw_KE'} = 1252;
+$ltansi{'th_TH'} = 874;
+$ltansi{'tr_TR'} = 1254;
+$ltansi{'tt_RU'} = 1251;
+$ltansi{'uk_UA'} = 1251;
+$ltansi{'ur_PK'} = 1256;
+$ltansi{'uz_UZ'} = 1251;
+$ltansi{'uz_UZ'} = 1254;
+$ltansi{'vi_VN'} = 1258;
+$ltansi{'wa_BE'} = 1252;
+$ltansi{'zh_HK'} = 950;
+$ltansi{'zh_SG'} = 936;
+$ltansi{'zh_MO'} = 950;
+
+# Detect OEM and ANSI code page
+# for current locale
+$lc = setlocale(LC_ALL);
+@lc = split /\./, $lc;
+$lc = @lc[0];
+$cp_oem = $ltoem{$lc};
+$cp_ansi = $ltansi{$lc};
+if (!$cp_oem) { $cp_oem = 437; }
+if (!$cp_ansi) { $cp_oem = 1252; }
+
+# Prepare converters (for "zip -d")
+use Text::Iconv;
+$to_oem = Text::Iconv->new("utf-8", "cp" . $cp_oem);
+$to_ansi = Text::Iconv->new("utf-8", "cp" . $cp_ansi);
+
+# Detect operating mode (zip, zip -d, unzip),
+# prepare transcoded arguments for "zip -d"
+foreach (@ARGV) {
+
+    $zip    ||= ($_ eq 'zip');
+    $delete ||= ($_ eq '-d');
+    $unzip  ||= ($_ eq 'unzip');
+
+    if (!$skip_next_param) {
+
+        if ($unzip && (($_ eq '-I') || ($_ eq '-O'))) {
+
+            # skip -I and -O unzip args as we will use own ones
+            $skip_next_param = 1;
+
+            # don't forget about -I=... and -O=... notation
+
+        } elsif (!$unzip || (index($_, "-I") != 0) && (index($_, "-O") != 0)) {
+
+            push(@arg, '"' . $_ . '"');
+
+            if ($zip) {
+
+                # We need to transcode file names in parameters only for zip tool calls
+
+                # Count continuous parameters not starting with dash
+                $first_char = substr $_, 0, 1;
+                if ($first_char ne '-') {
+                    $non_dash_count++;
+                } else {
+                    $non_dash_count = 0;
+                }
+
+                # Prepare transcoded file names for "zip -d" calls
+                # Transcode file names in archive, but not path to archive itself.
+                # Assume filenames are stored in parameters beginning from the second one
+                # not starting with dash.
+                if ($non_dash_count > 1) {
+
+                    $oem_str = $to_oem->convert($_);
+                    if (!$oem_str) { $oem_failed = 1; }
+                    push(@arg_oem, '"' . $oem_str . '"');
+
+                    $ansi_str = $to_ansi->convert($_);
+                    if (!$ansi_str) { $ansi_failed = 1; }
+                    push(@arg_ansi, '"' . $ansi_str . '"');
+
+                } else {
+
+                    push(@arg_oem, '"' . $_ . '"');
+                    push(@arg_ansi, '"' . $_ . '"');
+                }
+            }
+        }
+
+    } else {
+
+        $skip_next_param = '';
+    }        
+}
+
+if (scalar(@arg) == 1) {
+
+    # Info screen
+    help();
+
+} elsif ($zip) {
+
+    if ($delete) {
+        # First, let us try to delete without any filename transcoding
+        $cmd = join ' ', @arg;
+        $ret = qx($cmd);
+        if (($? == 3072) && (!$oem_failed)) {
+            # File not found in archive (error code 12 * 256 = 3072)?
+            # Retrying as OEM
+            $cmd = join ' ', @arg_oem;
+            $ret = qx($cmd);
+        }
+        if (($? == 3072) && (!$ansi_failed)) {
+            # File still not found in archive (error code 12 * 256 = 3072)?
+            # Retrying as ANSI
+            $cmd = join ' ', @arg_ansi;
+            $ret = qx($cmd);
+        }
+        print $ret;
+        exit $?;
+    } else {
+        # Pass to zip "as is"
+        $cmd = join ' ', @arg;
+        print qx($cmd);
+        exit $?;
+    }
+
+} elsif ($unzip) {
+
+    # Inject "-O CODEPAGE"
+    foreach (@arg) {
+        push (@arg2, $_);
+        if (!$inserted) {
+            push (@arg2, "-O");
+            push (@arg2, "cp" . $cp_oem);
+            $inserted = 1;
+        }
+    }
+    
+    $cmd = join ' ', @arg2;
+    $ret = qx($cmd);
+
+    if ($? == 2816) {
+        # File not found in archive (error code 11 * 256 = 2816)?
+        # Retrying as UTF-8
+        # (its workaround for far2l and google forms-generated zips)
+        @arg2 = '';
+        $inserted = '';
+        foreach (@arg) {
+            push (@arg2, $_);
+            if (!$inserted) {
+                push (@arg2, "-O");
+                push (@arg2, "utf-8");
+                $inserted = 1;
+            }
+        }
+
+        $cmd = join ' ', @arg2;
+        $ret = qx($cmd);
+    }
+
+    print $ret;
+    exit $?;
+
+} else {
+
+    if (@arg) {
+
+        # Pass to called program "as is"
+        $cmd = join ' ', @arg;
+        $ret = qx($cmd);
+
+        print $ret;
+        exit $?;
+
+    } else {
+
+        help();
+    }
+}
+
+sub help() {
+    print "\nzipwrapper, version 0.1\n\n";
+    print "This wrapper around zip and unzip tools detects OEM/ANSI code pages\n";
+    print "from system locale to process .zip archives using correct charset\n";
+    print "without any user interraction.\n\n";
+    print "Preserves zip/unzip return codes and output,\n";
+    print "so can be used with any program utilizing zip/unzip,\n";
+    print "like File Roller, Engrampa, Ark, far2l, etc.\n\n";
+    print "Usage:\n";
+    print "zipwrapper zip PARAMETERS\n";
+    print "zipwrapper unzip PARAMETERS\n\n";
+    print "Use zip --help or unzip --help for more details\n";
+}
