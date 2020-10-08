@@ -286,6 +286,11 @@ $cp_ansi = $ltansi{$lc};
 if (!$cp_oem) { $cp_oem = 437; }
 if (!$cp_ansi) { $cp_ansi = 1252; }
 
+# todo: unar/lsar uses different names for some code pages
+# for example, it treats code page "cp932" as "windows-31j"
+# so code page name translation is needed here
+# see https://github.com/elfmz/far2l/issues/775 for details
+
 # Prepare converters (for "zip -d")
 use Text::Iconv;
 $to_oem = Text::Iconv->new("utf-8", "cp" . $cp_oem);
