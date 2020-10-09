@@ -119,17 +119,15 @@ foreach my $member ($zip->members()) {
     # see https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
     $filename_7075 = ''; $counter = 0;
     while ($counter < length($member->cdExtraField)) {
-        $size = ord(substr($member->cdExtraField, $counter + 3, 1)) * 256 +
-                ord(substr($member->cdExtraField, $counter + 2, 1));
-        if    ((ord(substr($member->cdExtraField, $counter + 1, 1)) == 0x70) &&
-               (ord(substr($member->cdExtraField, $counter,     1)) == 0x75))
+        $size =   ord(substr($member->cdExtraField, $counter + 3, 1)) * 256 +
+                  ord(substr($member->cdExtraField, $counter + 2, 1));
+        if      ((ord(substr($member->cdExtraField, $counter + 1, 1)) == 0x70) &&
+                 (ord(substr($member->cdExtraField, $counter,     1)) == 0x75))
         {
-            # found 0x7075 "UTF-8 filename"
-            $filename_7075 = decode('UTF-8', substr($member->cdExtraField, $counter + 9, $size - 5));
-            # [2 byte header] [2 byte data size] [1 byte version] [4 byte crc32] = 9 bytes prefix to skip
-            # [1 byte version] [4 byte crc32] = 5 bytes size difference
+            $filename_7075 = decode('UTF-8',
+                      substr($member->cdExtraField, $counter + 4 + 5, $size - 5));
         }
-        $counter += (4 + $size); # proceed to next field
+        $counter += (4 + $size);
     }
 
     # main magic is here, taken from far2l's "multiarc" zip reader
