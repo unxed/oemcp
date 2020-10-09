@@ -80,6 +80,11 @@ foreach my $member ($zip->members()) {
     print "Suggested charset option for archivers: " .  color('yellow') .
         ($convert_charset ? $convert_charset : 'utf-8 or none') .  color('reset') . "\n";
 
+    # Escaping quotes in filename and zipfile before calling shell
+    $filename_unescaped = $filename;
+    $filename =~ s/"/\\"/g;
+    $zipFile =~ s/"/\\"/g;
+
     print "Probing with bsdtar: ";
     if ($filename_7075) { $convert_charset = ''; } # special bsdtar workaround: it always use 0x7075 if possible
     if ($convert_charset) {
@@ -91,7 +96,7 @@ foreach my $member ($zip->members()) {
     print $cmd . "\n";
     print color('red');
     $ret = decode('utf-8', qx($cmd));
-    if (!$? && (index($ret, $filename) != -1)) { print color('green'); } else { $all_ok = ''; }
+    if (!$? && (index($ret, $filename_unescaped) != -1)) { print color('green'); } else { $all_ok = ''; }
     print $ret;
     print color('reset');
 
@@ -105,9 +110,13 @@ foreach my $member ($zip->members()) {
     print $cmd . "\n";
     print color('red');
     $ret = decode('utf-8', qx($cmd));
-    if (!$? && (index($ret, $filename) != -1)) { print color('green'); } else { $all_ok = ''; }
+    if (!$? && (index($ret, $filename_unescaped) != -1)) { print color('green'); } else { $all_ok = ''; }
     print $ret;
     print color('reset');
+
+    # "zip -d" has no charset option, but cat be supplied with transcoded command line
+    # We can not implement probing with "zip -d" without actually deleting the file
+    # TODO: copy file to temporary one, do "zip -d" probe, mv file back
 
     print "Probing with lsar [unar package]: ";
     if ($filename_7075) { $convert_charset = ''; } # special lsar workaround: it always use 0x7075 if possible
@@ -119,11 +128,16 @@ foreach my $member ($zip->members()) {
     }
     print color('cyan');
     print $cmd . "\n";
-    print color('red');
-    $ret = decode('utf-8', qx($cmd));
-    if (!$? && (index($ret, $filename) != -1)) { print color('green'); } else { $all_ok = ''; }
-    print $ret;
-    print color('reset');
+    if (index($filename, '._') == -1) {
+        print color('red');
+        $ret = decode('utf-8', qx($cmd));
+        if (!$? && (index($ret, $filename_unescaped) != -1)) { print color('green'); } else { $all_ok = ''; }
+        print $ret;
+        print color('reset');
+    } else {
+        print color('reset');
+        print "Skipped lsar probe for file with '._' in name: lsar will not list it anyway\n";
+    }
 }
 
 print "\nProbing result: " .
