@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# todo: check if installed unzip supports -I/-O
+# todo: code pages from system locale
+
 # see also https://rt.cpan.org/Public/Bug/Display.html?id=35334
 
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
