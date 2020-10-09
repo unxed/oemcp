@@ -116,21 +116,16 @@ foreach my $member ($zip->members()) {
     # print "cdExtraField: "    . $member->cdExtraField    . " \n";
 
     # parse cdExtraField to extract 0x7075 UTF-8 filename if possible
-    $filename_7075 = '';
-    $cdExtraDec = $member->cdExtraField;
-    $cdExtraDec =~ s/(.)/sprintf '%02d ', ord $1/seg;
-    my @cdExtraAsArray = split / /, $cdExtraDec;
-    $counter = 0;
-    while ($counter < scalar @cdExtraAsArray) {
-        $size = $cdExtraAsArray[$counter + 2] + $cdExtraAsArray[$counter + 3] * 256;
-        if (($cdExtraAsArray[$counter] == 0x75) && ($cdExtraAsArray[$counter + 1] == 0x70)) {
+    $extra = $member->cdExtraField;
+    while ($counter < length($extra)) {
+        $size = ord(substr($extra, $counter + 2, 1)) + ord(substr($extra, $counter + 3, 1)) * 256;
+        if ((ord(substr($extra, $counter + 1, 1)) == 0x70) && (ord(substr($extra, $counter, 1)) == 0x75)) {
             # found 0x7075 "UTF-8 filename"
-            $filename_7075 = substr($member->cdExtraField, $counter + 9, $size - 5);
-            # [2 byte header] [2 byte data size] [1 byte version] [ 4 byte crc32] = 9 bytes
-            # [1 byte version] [ 4 byte crc32] = 5 bytes
-            $filename_7075 = decode('UTF-8', $filename_7075);
+            $filename_7075 = decode('UTF-8', substr($member->cdExtraField, $counter + 9, $size - 5));
+            # [2 byte header] [2 byte data size] [1 byte version] [4 byte crc32] = 9 bytes prefix to skip
+            # [1 byte version] [4 byte crc32] = 5 bytes size difference
         }
-        $counter += 4 + $size; # proceed to next field
+        $counter += (4 + $size); # proceed to next field
     }
 
     # main magic is here, taken from far2l's "multiarc" zip reader
