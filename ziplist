@@ -116,11 +116,14 @@ foreach my $member ($zip->members()) {
     # print "cdExtraField: "    . $member->cdExtraField    . " \n";
 
     # parse cdExtraField to extract 0x7075 UTF-8 filename if possible
+    # see https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
     $filename_7075 = ''; $counter = 0;
-    $extra = $member->cdExtraField;
-    while ($counter < length($extra)) {
-        $size = ord(substr($extra, $counter + 2, 1)) + ord(substr($extra, $counter + 3, 1)) * 256;
-        if ((ord(substr($extra, $counter + 1, 1)) == 0x70) && (ord(substr($extra, $counter, 1)) == 0x75)) {
+    while ($counter < length($member->cdExtraField)) {
+        $size = ord(substr($member->cdExtraField, $counter + 3, 1)) * 256 +
+                ord(substr($member->cdExtraField, $counter + 2, 1));
+        if    ((ord(substr($member->cdExtraField, $counter + 1, 1)) == 0x70) &&
+               (ord(substr($member->cdExtraField, $counter,     1)) == 0x75))
+        {
             # found 0x7075 "UTF-8 filename"
             $filename_7075 = decode('UTF-8', substr($member->cdExtraField, $counter + 9, $size - 5));
             # [2 byte header] [2 byte data size] [1 byte version] [4 byte crc32] = 9 bytes prefix to skip
