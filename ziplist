@@ -116,6 +116,7 @@ foreach my $member ($zip->members()) {
     # print "cdExtraField: "    . $member->cdExtraField    . " \n";
 
     # parse cdExtraField to extract 0x7075 UTF-8 filename if possible
+    $filename_7075 = '';
     $extra = $member->cdExtraField;
     while ($counter < length($extra)) {
         $size = ord(substr($extra, $counter + 2, 1)) + ord(substr($extra, $counter + 3, 1)) * 256;
