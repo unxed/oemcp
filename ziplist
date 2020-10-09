@@ -138,31 +138,31 @@ foreach my $member ($zip->members()) {
     if ($member->{bitFlag} & 0x0800) {
         # 0x0800 UTF-8 flag is set? assume "filename" filed is in utf-8
         $filename = $member->fileName;
-        $filename_source = "Legacy, UTF-8";
+        $filename_source = "Legacy in UTF-8";
     } elsif (($member->fileAttributeFormat == 11) && ($member->versionMadeBy >= 20) && ($member->versionMadeBy < 25)) {
         # packed on win by winzip 20..24? assume "filename" field is in ANSI charser
         $convert_charset = $cp_ansi;
         $filename = decode($convert_charset, $member->fileName);
-        $filename_source = "Legacy, ANSI";
+        $filename_source = "Legacy in ANSI";
     } elsif (($member->fileAttributeFormat == 11) || ($member->fileAttributeFormat == 0)) {
         # packed on dos or win? assume "filename" field is in UTF-8 charser
         $convert_charset = $cp_oem;
         $filename = decode($convert_charset, $member->fileName);
-        $filename_source = "Legacy, OEM";
+        $filename_source = "Legacy in OEM";
     } else {
         # all other cases - assume UTF-8
         # macos, for example
         # why do we need utf-8 decode here, but not need in 0x0800 check branch?
         # possibly bug in Archive::Zip
         $filename = decode('utf-8', $member->fileName);
-        $filename_source = "Legacy, UTF-8";
+        $filename_source = "Legacy in UTF-8";
     }
     $filename_legacy = $filename;
     if ($filename_7075) {
         # 0x7075 "UTF-8 filename" field is present? let's override detected filename with it
         # (but save $convert_charset for possible later usage)
         $filename = $filename_7075;
-        $filename_source = "0x7075, UTF-8";
+        $filename_source = "0x7075";
     }
 
 =pdo
