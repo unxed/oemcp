@@ -9,10 +9,13 @@ use Term::ANSIColor;
 use Data::Dumper qw(Dumper);
 #print Dumper \@var;
 
-($zipFile) = @ARGV;
+$ansi_cp = 'cp1251';
+$oem_cp = 'cp866';
+
+($zipFile, $option) = @ARGV;
 $zipFile = decode('UTF-8', $zipFile);
 
-if (!$zipFile) { print "Usage: ziplist[.pl] zipfile.zip\n"; exit; }
+if (!$zipFile) { print "Usage: ziplist[.pl] zipfile.zip [-p]\n"; exit; }
 
 my $zip = Archive::Zip->new();
 unless ( $zip->read( $zipFile ) == AZ_OK ) {  # Make sure archive got read
@@ -45,101 +48,124 @@ foreach my $member ($zip->members()) {
     }
 
     # main magic is here, taken from far2l's "multiarc" zip reader
+    $convert_charset = '';
     if ($member->{bitFlag} & 0x0800) {
         # 0x0800 UTF-8 flag is set? assume "filename" filed is in utf-8
         $filename = $member->fileName;
     } elsif (($member->fileAttributeFormat == 11) && ($member->versionMadeBy >= 20) && ($member->versionMadeBy < 25)) {
         # packed on win by winzip 20..24? assume "filename" field is in ANSI charser
-        $convert_charset = 'cp1251';
+        $convert_charset = $ansi_cp;
         $filename = decode($convert_charset, $member->fileName);
     } elsif (($member->fileAttributeFormat == 11) || ($member->fileAttributeFormat == 0)) {
         # packed on dos or win? assume "filename" field is in UTF-8 charser
-        $convert_charset = 'cp866';
+        $convert_charset = $oem_cp;
         $filename = decode($convert_charset, $member->fileName);
     } else {
         # all other cases - assume UTF-8
+        # macos, for example
         # why do we need utf-8 decode here, but not need in 0x0800 check branch?
         # possibly bug in Archive::Zip
         $filename = decode('utf-8', $member->fileName);
     }
+    $filename_legacy = $filename;
     if ($filename_7075) {
         # 0x7075 "UTF-8 filename" field is present? let's override detected filename with it
-        # (but save $convert_charset for later usage as some archivers do not understand 0x7075)
+        # (but save $convert_charset for possible later usage)
         $filename = $filename_7075;
     }
 
+=pdo
     print "\n";
-    print "Filename: " . $member->fileName . "\n";
-    print "Filename in 0x7075 field: " . $filename_7075 . "\n";
-    #print "\n";
+    $filename_raw = $member->fileName;
+    $filename_hex = $member->fileName;
+    $filename_hex =~ s/(.)/sprintf '%04x ', ord $1/seg;
+    print "Legacy filename (raw): " . $filename_raw . "\n";
+    print "Legacy filename (raw hex): " . $filename_hex . "\n";
+=cut
+
+    print "\n";
     print "Packer version: " . $member->versionMadeBy . "\n";
     print "Packer OS: " . $member->fileAttributeFormat . "\n";
     print "0x0800 flag: " . (($member->{bitFlag} & 0x0800) ? 'yes' : 'no') . "\n"; # UTF-8 flag
-    #print "\n";
+    print "Legacy filename probably stored in: " . ($convert_charset ? $convert_charset : 'utf-8') . "\n";
+    print "Legacy filename (decoded): " . $filename_legacy . "\n";
+    print "Filename in 0x7075 field: " . ($filename_7075 ? $filename_7075 : 'none') . "\n";
     print "Filename, best guess: " . color('yellow') . $filename . color('reset') . "\n";
-    print "Suggested charset option for archivers: " .  color('yellow') .
-        ($convert_charset ? $convert_charset : 'utf-8 or none') .  color('reset') . "\n";
 
+    # Generating switches for archivers
+    if ($filename_7075) { $convert_charset = ''; } # use 0x7075 if possible
+    $bsdtar = ''; $unzip = ''; $lsar = '';
+    if ($convert_charset) {
+        $bsdtar = '--option hdrcharset=' . $convert_charset;
+    }
+    if ($convert_charset) {
+        $unzip = '-I ' . $convert_charset . ' -O ' . $convert_charset;
+    } else {
+        # needed for google forms-generated zips
+        $unzip = '-I utf-8 -O utf-8';
+    }
+    if ($convert_charset) {
+        $lsar = '-e ' . $convert_charset;
+    }
+
+    print "Suggested additional bsdtar switches: " . ($bsdtar ? $bsdtar : 'none') . "\n";
+    print "Suggested additional unzip switches: " . ($unzip ? $unzip : 'none') . "\n";
+    print "Suggested additional lsar switches: " . ($lsar ? $lsar : 'none') . "\n";
+    
     # Escaping quotes in filename and zipfile before calling shell
     $filename_unescaped = $filename;
     $filename =~ s/"/\\"/g;
     $zipFile =~ s/"/\\"/g;
 
-    print "Probing with bsdtar: ";
-    if ($filename_7075) { $convert_charset = ''; } # special bsdtar workaround: it always use 0x7075 if possible
-    if ($convert_charset) {
-        $cmd = 'bsdtar t --option hdrcharset=' . $convert_charset . ' -f "' . $zipFile . '" "' . $filename . '"';
-    } else {
-        $cmd = 'bsdtar t -f "' . $zipFile . '" "' . $filename . '"';
-    }
-    print color('cyan');
-    print $cmd . "\n";
-    print color('red');
-    $ret = decode('utf-8', qx($cmd));
-    if (!$? && (index($ret, $filename_unescaped) != -1)) { print color('green'); } else { $all_ok = ''; }
-    print $ret;
-    print color('reset');
+    # Probing archivers
 
-    print "Probing with unzip: ";
-    if ($convert_charset) {
-        $cmd = 'unzip -I ' . $convert_charset . ' -O ' . $convert_charset . ' -l "' . $zipFile . '" "' . $filename . '"';
-    } else {
-        $cmd = 'unzip -I utf-8 -O utf-8 -l "' . $zipFile . '" "' . $filename . '"';
-    }
-    print color('cyan');
-    print $cmd . "\n";
-    print color('red');
-    $ret = decode('utf-8', qx($cmd));
-    if (!$? && (index($ret, $filename_unescaped) != -1)) { print color('green'); } else { $all_ok = ''; }
-    print $ret;
-    print color('reset');
-
-    # "zip -d" has no charset option, but cat be supplied with transcoded command line
-    # We can not implement probing with "zip -d" without actually deleting the file
-    # TODO: copy file to temporary one, do "zip -d" probe, mv file back
-
-    print "Probing with lsar [unar package]: ";
-    if ($filename_7075) { $convert_charset = ''; } # special lsar workaround: it always use 0x7075 if possible
-    $filename_for_lsar = $filename; $filename_for_lsar =~ s/\/$//ig; # lsar do not understands "folder/"
-    if ($convert_charset) {
-        $cmd = 'lsar -e ' . $convert_charset . ' "' . $zipFile . '" "' . $filename_for_lsar . '"';
-    } else {
-        $cmd = 'lsar -e utf-8 "' . $zipFile . '" "' . $filename_for_lsar . '"';
-    }
-    print color('cyan');
-    print $cmd . "\n";
-    if (index($filename, '._') == -1) {
+    if ($option eq '-p') {
+        print "Probing with bsdtar: ";
+        $cmd = 'bsdtar t ' . $bsdtar . ' -f "' . $zipFile . '" "' . $filename . '"';
+        print color('cyan');
+        print $cmd . "\n";
         print color('red');
         $ret = decode('utf-8', qx($cmd));
         if (!$? && (index($ret, $filename_unescaped) != -1)) { print color('green'); } else { $all_ok = ''; }
         print $ret;
         print color('reset');
-    } else {
+
+        print "Probing with unzip: ";
+        $cmd = 'unzip ' . $unzip . ' -l "' . $zipFile . '" "' . $filename . '"';
+        print color('cyan');
+        print $cmd . "\n";
+        print color('red');
+        $ret = decode('utf-8', qx($cmd));
+        if (!$? && (index($ret, $filename_unescaped) != -1)) { print color('green'); } else { $all_ok = ''; }
+        print $ret;
         print color('reset');
-        print "Skipped lsar probe for file with '._' in name: lsar will not list it anyway\n";
+
+        # "zip -d" has no charset option, but cat be supplied with transcoded command line
+        # We can not implement probing with "zip -d" without actually deleting the file
+        # TODO: copy file to temporary one, do "zip -d" probe, mv file back
+
+        print "Probing with lsar [unar package]: ";
+        $filename_for_lsar = $filename; $filename_for_lsar =~ s/\/$//ig; # lsar do not understands "folder/"
+        $cmd = 'lsar ' . $lsar . ' "' . $zipFile . '" "' . $filename_for_lsar . '"';
+        print color('cyan');
+        print $cmd . "\n";
+        if (index($filename, '._') == -1) {
+            print color('red');
+            $ret = decode('utf-8', qx($cmd));
+            if (!$? && (index($ret, $filename_unescaped) != -1)) { print color('green'); } else { $all_ok = ''; }
+            print $ret;
+            print color('reset');
+        } else {
+            print color('reset');
+            print "Skipped lsar probe for file with '._' in name: lsar will not list it anyway\n";
+        }
     }
 }
 
-print "\nProbing result: " .
-    ( $all_ok ? (color('green') . 'PASSED') : (color('red') . 'FAIL') ) .
-    color('reset') . "\n";
+if ($option eq '-p') {
+    print "\nLast filename, best guess: " . color('yellow') . $filename . color('reset') . "\n";
+
+    print "Probing result: " .
+        ( $all_ok ? (color('green') . 'PASSED') : (color('red') . 'FAIL') ) .
+        color('reset') . "\n";
+}
