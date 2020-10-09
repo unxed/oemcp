@@ -1,0 +1,131 @@
+#!/usr/bin/perl
+
+# see also https://rt.cpan.org/Public/Bug/Display.html?id=35334
+
+use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
+use open qw/ :std OUT :encoding(UTF-8) /;
+use Encode qw/ decode /;
+use Term::ANSIColor;
+use Data::Dumper qw(Dumper);
+#print Dumper \@var;
+
+($zipFile) = @ARGV;
+$zipFile = decode('UTF-8', $zipFile);
+
+if (!$zipFile) { print "Usage: ziplist[.pl] zipfile.zip\n"; exit; }
+
+my $zip = Archive::Zip->new();
+unless ( $zip->read( $zipFile ) == AZ_OK ) {  # Make sure archive got read
+    die 'read error';
+}
+
+$all_ok = 1;
+
+foreach my $member ($zip->members()) {
+
+    # print "localExtraField: " . $member->localExtraField . " \n"; # always empty for some reason
+    # print "cdExtraField: "    . $member->cdExtraField    . " \n";
+
+    # parse cdExtraField to extract 0x7075 UTF-8 filename if possible
+    $filename_7075 = '';
+    $cdExtraDec = $member->cdExtraField;
+    $cdExtraDec =~ s/(.)/sprintf '%02d ', ord $1/seg;
+    my @cdExtraAsArray = split / /, $cdExtraDec;
+    $counter = 0;
+    while ($counter < scalar @cdExtraAsArray) {
+        $size = $cdExtraAsArray[$counter + 2] + $cdExtraAsArray[$counter + 3] * 256;
+        if (($cdExtraAsArray[$counter] == 0x75) && ($cdExtraAsArray[$counter + 1] == 0x70)) {
+            # found 0x7075 "UTF-8 filename"
+            $filename_7075 = substr($member->cdExtraField, $counter + 9, $size - 5);
+            # [2 byte header] [2 byte data size] [1 byte version] [ 4 byte crc32] = 9 bytes
+            # [1 byte version] [ 4 byte crc32] = 5 bytes
+            $filename_7075 = decode('UTF-8', $filename_7075);
+        }
+        $counter += 4 + $size; # proceed to next field
+    }
+
+    # main magic is here, taken from far2l's "multiarc" zip reader
+    if ($member->{bitFlag} & 0x0800) {
+        # 0x0800 UTF-8 flag is set? assume "filename" filed is in utf-8
+        $filename = $member->fileName;
+    } elsif (($member->fileAttributeFormat == 11) && ($member->versionMadeBy >= 20) && ($member->versionMadeBy < 25)) {
+        # packed on win by winzip 20..24? assume "filename" field is in ANSI charser
+        $convert_charset = 'cp1251';
+        $filename = decode($convert_charset, $member->fileName);
+    } elsif (($member->fileAttributeFormat == 11) || ($member->fileAttributeFormat == 0)) {
+        # packed on dos or win? assume "filename" field is in UTF-8 charser
+        $convert_charset = 'cp866';
+        $filename = decode($convert_charset, $member->fileName);
+    } else {
+        # all other cases - assume UTF-8
+        # why do we need utf-8 decode here, but not need in 0x0800 check branch?
+        # possibly bug in Archive::Zip
+        $filename = decode('utf-8', $member->fileName);
+    }
+    if ($filename_7075) {
+        # 0x7075 "UTF-8 filename" field is present? let's override detected filename with it
+        # (but save $convert_charset for later usage as some archivers do not understand 0x7075)
+        $filename = $filename_7075;
+    }
+
+    print "\n";
+    print "Filename: " . $member->fileName . "\n";
+    print "Filename in 0x7075 field: " . $filename_7075 . "\n";
+    #print "\n";
+    print "Packer version: " . $member->versionMadeBy . "\n";
+    print "Packer OS: " . $member->fileAttributeFormat . "\n";
+    print "0x0800 flag: " . (($member->{bitFlag} & 0x0800) ? 'yes' : 'no') . "\n"; # UTF-8 flag
+    #print "\n";
+    print "Filename, best guess: " . color('yellow') . $filename . color('reset') . "\n";
+    print "Suggested charset option for archivers: " .  color('yellow') .
+        ($convert_charset ? $convert_charset : 'utf-8 or none') .  color('reset') . "\n";
+
+    print "Probing with bsdtar: ";
+    if ($filename_7075) { $convert_charset = ''; } # special bsdtar workaround: it always use 0x7075 if possible
+    if ($convert_charset) {
+        $cmd = 'bsdtar t --option hdrcharset=' . $convert_charset . ' -f "' . $zipFile . '" "' . $filename . '"';
+    } else {
+        $cmd = 'bsdtar t -f "' . $zipFile . '" "' . $filename . '"';
+    }
+    print color('cyan');
+    print $cmd . "\n";
+    print color('red');
+    $ret = decode('utf-8', qx($cmd));
+    if (!$? && (index($ret, $filename) != -1)) { print color('green'); } else { $all_ok = ''; }
+    print $ret;
+    print color('reset');
+
+    print "Probing with unzip: ";
+    if ($convert_charset) {
+        $cmd = 'unzip -I ' . $convert_charset . ' -O ' . $convert_charset . ' -l "' . $zipFile . '" "' . $filename . '"';
+    } else {
+        $cmd = 'unzip -I utf-8 -O utf-8 -l "' . $zipFile . '" "' . $filename . '"';
+    }
+    print color('cyan');
+    print $cmd . "\n";
+    print color('red');
+    $ret = decode('utf-8', qx($cmd));
+    if (!$? && (index($ret, $filename) != -1)) { print color('green'); } else { $all_ok = ''; }
+    print $ret;
+    print color('reset');
+
+    print "Probing with lsar [unar package]: ";
+    if ($filename_7075) { $convert_charset = ''; } # special lsar workaround: it always use 0x7075 if possible
+    $filename_for_lsar = $filename; $filename_for_lsar =~ s/\/$//ig; # lsar do not understands "folder/"
+    if ($convert_charset) {
+        $cmd = 'lsar -e ' . $convert_charset . ' "' . $zipFile . '" "' . $filename_for_lsar . '"';
+    } else {
+        $cmd = 'lsar -e utf-8 "' . $zipFile . '" "' . $filename_for_lsar . '"';
+    }
+    print color('cyan');
+    print $cmd . "\n";
+    print color('red');
+    $ret = decode('utf-8', qx($cmd));
+    if (!$? && (index($ret, $filename) != -1)) { print color('green'); } else { $all_ok = ''; }
+    print $ret;
+    print color('reset');
+}
+
+print "\nProbing result: " .
+    ( $all_ok ? (color('green') . 'PASSED') : (color('red') . 'FAIL') ) .
+    color('reset') . "\n";
