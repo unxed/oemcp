@@ -200,6 +200,13 @@ foreach my $member ($zip->members()) {
     print "Suggested additional bsdtar switches: " . ($bsdtar ? $bsdtar : 'none') . "\n";
     print "Suggested additional unzip switches: " . ($unzip ? $unzip : 'none') . "\n";
     print "Suggested additional lsar switches: " . ($lsar ? $lsar : 'none') . "\n";
+
+    # As "zip -d" does not support any charset option, you have to сonvert
+    # filenames you are planning to remove from archive
+    # to "Legacy filename encoding for current locale" (if it is not utf-8), like
+    # zip -d ARCHIVE.zip "`echo FILENAME_TO_DELETE | iconv -f utf-8 -t CHARSET`"
+    # This sometimes may require your system locale to match archive charset,
+    # but that's the best thing we can do with "zip -d"
     
     # Escaping quotes in filename and zipfile before calling shell
     $filename_unescaped = $filename;
