@@ -1,4 +1,9 @@
 # oemcp
+
+**2023 update: you'd better use [libnatspec](https://github.com/Etersoft/libnatspec) instead. It's more complete and supported better. [Details](https://github.com/Etersoft/libnatspec/issues/3)**
+
+---
+
 Small utility to get corresponding OEM code page from current locale (posix). License: Public Domain
 
 Run oemcp_gen.pl inside wine/dlls/kernel32/nls from Wine source code tree to generate oemcp.sh
